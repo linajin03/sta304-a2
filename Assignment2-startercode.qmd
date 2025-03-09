@@ -1,6 +1,6 @@
 ---
 title: "ADD IN MEANINGFUL TITLE HERE"
-author: "GROUP NUMBER: ADD YOUR NAMES HERE"
+author: "Group 24: You Yu Fu, Eric Guo, Finn Tran, Lina Jin"
 subtitle: "STA304 - Winter 2025 - Assignment 2"
 format: pdf
 editor: visual
@@ -77,7 +77,7 @@ Present a table showing the estimated proportion of votes for the selected party
 In Table 1 I present both confidence intervals of....
 
 |   | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | Phone Survey | 0.34 | (lower bound, upper bound) |
 | Web Survey | 0.25 | (lower bound, upper bound) |
 
