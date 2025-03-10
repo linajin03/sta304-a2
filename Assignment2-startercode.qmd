@@ -79,13 +79,13 @@ phone_data <-
 
 ```
 
-Plotting q61 as ISCED_Level
+Plotting ISCED_Level (based on q61), and Voting preference (based on q11):
 
 ```{r, echo = FALSE}
 
 #Distribution of Isced Level
 
-hist(phone_data$isced_level, main = "Historgram of ISCED_Level", xlab = 'ISCED_Level', col = "black")
+hist(phone_data$isced_level, main = "Histogram of ISCED_Level", xlab = 'ISCED_Level', col = "black")
 
 #Distribution of voting preference
 
@@ -102,20 +102,26 @@ ggplot(vote_counts, aes(x = voting_choice, y = count, fill = voting_choice)) +
   ) +
   theme_minimal() + 
   scale_fill_manual(values = c("Liberal" = "darkred", "Non Liberal" = "darkblue", "Unknown" = "gray"))
+
+#Age Distribution
+
+hist(phone_data$age, main = "Histogram of Ages", xlab = "Ages", col = "brown")
 ```
 
 We can make further comparisons on phone survey participants in the 'Unknown' category vs those who provided an answer.
 
-```{r, include = FALSE}
+```{r, echo = FALSE}
 phone_data_unknown <- phone_data %>% filter(voting_choice == 'Unknown')
 phone_data_known <- phone_data %>% filter(voting_choice == 'Liberal' | voting_choice == 'Non Liberal')
 
 #Unknown Dist
-hist(phone_data_unknown$isced_level, main = "Historgram of ISCED_Level", xlab = 'ISCED_Level', col = "black")
+hist(phone_data_unknown$isced_level, main = "Historgram of ISCED_Level of 'Unknown' Voting Preference", xlab = 'ISCED_Level', col = "black")
 
 #Known Dist
-hist(phone_data_known$isced_level, main = "Historgram of ISCED_Level", xlab = 'ISCED_Level', col = "brown")
+hist(phone_data_known$isced_level, main = "Historgram of ISCED_Level of 'Known' Voting Preference", xlab = 'ISCED_Level', col = "brown")
 ```
+
+These distributions are very similar, therefore, they could potentially be removed?
 
 # 3 Methods
 
