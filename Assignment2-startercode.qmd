@@ -85,7 +85,10 @@ Plotting ISCED_Level (based on q61), and Voting preference (based on q11):
 
 #Distribution of Isced Level
 
-hist(phone_data$isced_level, main = "Histogram of ISCED_Level", xlab = 'ISCED_Level', col = "black")
+hist(phone_data$isced_level, main = "Phone Data ISCED_Level Dsitribution", xlab = 'ISCED_Level', col = "darkred")
+
+boxplot(phone_data$isced_level,
+        main = "Phone Data ISCED_Level Boxplot")
 
 #Distribution of voting preference
 
@@ -105,8 +108,22 @@ ggplot(vote_counts, aes(x = voting_choice, y = count, fill = voting_choice)) +
 
 #Age Distribution
 
-hist(phone_data$age, main = "Histogram of Ages", xlab = "Ages", col = "brown")
+hist(phone_data$age, main = "Phone Data Age Distribution", xlab = "Age", col = "darkblue")
+
+boxplot(phone_data$age,
+        main = "Phone Data Age Boxplot")
 ```
+
+```{r}
+#Summary statistics
+print("ISCED LEVEL")
+summary(phone_data$isced_level)
+
+print("AGE")
+summary(phone_data$age)
+```
+
+From the summary statistics and graph, we can see that the survey population is decently well educated, with a mean ISCED score of around 5 and a median of 6. This means that the average survey respondent has at least been to community college. The ISCED_Level distribution appears to be left skewed, with the interquartile range from 4 to mostly 6 from the box plot and histogram. The age seems slightly right-skewed, with the interquartile range from late 30’s to early 60’s from the box plot, but has a higher range of ages from 18 to late 90’s. Among the web survey respondents, it shows a slight bi-modal distribution on the histogram, with the interquartile range from from late 30’s to early 60’s(maybe edit, I copy pasted this).
 
 We can make further comparisons on phone survey participants in the 'Unknown' category vs those who provided an answer.
 
@@ -148,7 +165,7 @@ Present a table showing the estimated proportion of votes for the selected party
 In Table 1 I present both confidence intervals of....
 
 |              | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
-|------------------|-----------------------|-------------------------------|
+|----------------|-----------------------|---------------------------------|
 | Phone Survey | 0.34                           | (lower bound, upper bound)                  |
 | Web Survey   | 0.25                           | (lower bound, upper bound)                  |
 
