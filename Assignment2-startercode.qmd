@@ -104,6 +104,19 @@ ggplot(vote_counts, aes(x = voting_choice, y = count, fill = voting_choice)) +
   scale_fill_manual(values = c("Liberal" = "darkred", "Non Liberal" = "darkblue", "Unknown" = "gray"))
 ```
 
+We can make further comparisons on phone survey participants in the 'Unknown' category vs those who provided an answer.
+
+```{r, include = FALSE}
+phone_data_unknown <- phone_data %>% filter(voting_choice == 'Unknown')
+phone_data_known <- phone_data %>% filter(voting_choice == 'Liberal' | voting_choice == 'Non Liberal')
+
+#Unknown Dist
+hist(phone_data_unknown$isced_level, main = "Historgram of ISCED_Level", xlab = 'ISCED_Level', col = "black")
+
+#Known Dist
+hist(phone_data_known$isced_level, main = "Historgram of ISCED_Level", xlab = 'ISCED_Level', col = "brown")
+```
+
 # 3 Methods
 
 Include the formula for calculating the confidence interval for proportions (do not include specific numbers yet) and provide a description of its components. Present the logistic regression model, specifying the independent variables and expected interpretation of coefficients (parameters, not estimates), and describe the model. In this section you are preparing the reader for how to interpret the numbers displayed in the next section (Results).
