@@ -7,14 +7,9 @@ editor: visual
 ---
 
 ```{r, include = FALSE}
-
-# Here you can load in and clean the data (you may need to do the cleaning in a separate R script - this is up to you). 
 library(tidyverse)
 
 phone_data <- read_csv("ces_phone.csv")
-web_data <- read_csv("ces_web.csv")
-
-# You may need additional chunks, in case you want to include some of the cleaning output.
 
 ```
 
@@ -27,29 +22,86 @@ In this section you will briefly describe your report. Explain the importance of
 Briefly introduce the data and key variables of interest. If you do any general data cleaning or data processing you should describe it (in a reproducible manner) here. Identify the stratification variable used. Include at least one plot displaying the distribution of the strata variable. If you do any data cleaning or data processing to the you should describe it (in a reproducible manner) in this section.
 
 ```{r, include = FALSE}
+#NA values in age, most likely to vote for (q11) and education level q(61)
+na_count <- phone_data %>%
+  summarize(
+    q11 = sum(is.na(q11)),
+    q61 = sum(is.na(q61)),
+    age = sum(is.na(age))
+  )
 
-# Here you can clean the data. 
+#removing NA values in q11 (81 is a low number)
 
-# You may need additional chunks, in case you want to include some of the cleaning output.
+phone_data <- phone_data %>% filter(!is.na(q11))
 
-# For example, maybe I want to look at gender, and I want to update the labels of the gender variable in the phone data, to match the web data.
+#Checking non response answers (-9, -8, -7 for q11 and q61) and valid age
+
+no_response_count <- phone_data %>%
+  summarize(
+    q11 = sum(q11 < 0),
+    q61 = sum(q61 < 0),
+    age = sum(age < 18)
+  )
+
+#removing non response from q61 (11 is a small number)
+
+phone_data <- phone_data %>% filter(q61 > 0)
+```
+
+Given that over 25% of phone survey participants chose not to say which party they were going to vote for in the upcoming election, I will generalize this category (q11) into 3 responses, 'Unknown', 'Liberal', and 'Not Liberal'. Removing all these observations could introduce bias into our analysis and decrease the significance of our results.
+
+```{r, include = FALSE}
+
+
+# Data Cleaning: Convert q61 into ISCED
+isced_mapping <- c(
+  '1' = 0,  # ISCED 0 -> No school
+  '2' = 1,  # ISCED 1 -> Some elem
+  '3' = 1,  # ISCED 1 -> Elem
+  '4' = 2,  # ISCED 2 -> Some high school
+  '5' = 3,  # ISCED 3 -> High school diploma
+  '6' = 4,  # ISCED 4 -> Some community colege
+  '7' = 5,  # ISCED 5 -> Community College
+  '8' = 6,  # ISCED 6 -> Some university
+  '9' = 6,  # ISCED 6 -> Bachelor
+  '10' = 7,  # ISCED 7 -> Master
+  '11' = 7  # ISCED 7 -> PHD
+)
 
 phone_data <- 
-  phone_data %>% 
-  mutate(gender = case_when(q3==1 ~ "Man",
-                            q3==2 ~ "Woman",
-                            q3==3 ~ "Other")) 
+  phone_data %>%
+  mutate(isced_level = isced_mapping[as.character(phone_data$q61)],
+         voting_choice = case_when(
+           phone_data$q11 == 1 ~ 'Liberal',
+           phone_data$q11 < 0 ~ 'Unknown',
+           phone_data$q11 != 0 ~ 'Non Liberal'
+         ))
 
 ```
 
-Be sure to have text describing any plots or tables included.
+Plotting q61 as ISCED_Level
 
 ```{r, echo = FALSE}
 
-# Use this to create your plots/visualization. 
+#Distribution of Isced Level
 
-hist(phone_data$q3) 
+hist(phone_data$isced_level, main = "Historgram of ISCED_Level", xlab = 'ISCED_Level', col = "brown")
 
+#Distribution of voting preference
+
+vote_counts <- phone_data %>% group_by(voting_choice) %>% summarize(count = n())
+
+ggplot(vote_counts, aes(x = voting_choice, y = count, fill = voting_choice)) +
+  geom_bar(stat = "identity") +  # Create bar graph
+  geom_text(aes(label = count), vjust = -0.5, color = "black") +  # Add labels
+  labs(
+    title = "Voting Choice Distribution",
+    x = "Voting Choice",
+    y = "Count",
+    fill = "Voting Choice"
+  ) +
+  theme_minimal() + 
+  scale_fill_manual(values = c("Liberal" = "blue", "Non Liberal" = "red", "Unknown" = "gray"))
 ```
 
 # 3 Methods
@@ -76,10 +128,10 @@ Present a table showing the estimated proportion of votes for the selected party
 
 In Table 1 I present both confidence intervals of....
 
-|   | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
-|------------------------|------------------------|------------------------|
-| Phone Survey | 0.34 | (lower bound, upper bound) |
-| Web Survey | 0.25 | (lower bound, upper bound) |
+|              | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
+|------------------|-----------------------|-------------------------------|
+| Phone Survey | 0.34                           | (lower bound, upper bound)                  |
+| Web Survey   | 0.25                           | (lower bound, upper bound)                  |
 
 : The proportions and 95% confidence intervals of outcome variable of interest calculated for both the Canadian Election Study 2019 phone and web survey data.
 
