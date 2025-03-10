@@ -85,7 +85,7 @@ Plotting q61 as ISCED_Level
 
 #Distribution of Isced Level
 
-hist(phone_data$isced_level, main = "Historgram of ISCED_Level", xlab = 'ISCED_Level', col = "brown")
+hist(phone_data$isced_level, main = "Historgram of ISCED_Level", xlab = 'ISCED_Level', col = "black")
 
 #Distribution of voting preference
 
@@ -101,7 +101,7 @@ ggplot(vote_counts, aes(x = voting_choice, y = count, fill = voting_choice)) +
     fill = "Voting Choice"
   ) +
   theme_minimal() + 
-  scale_fill_manual(values = c("Liberal" = "blue", "Non Liberal" = "red", "Unknown" = "gray"))
+  scale_fill_manual(values = c("Liberal" = "darkred", "Non Liberal" = "darkblue", "Unknown" = "gray"))
 ```
 
 # 3 Methods
