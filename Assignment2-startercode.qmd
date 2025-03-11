@@ -8,6 +8,10 @@ editor: visual
 
 ```{r, include = FALSE}
 library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(broom)
+library(knitr)
 
 phone_data <- read_csv("ces_phone.csv")
 
@@ -40,6 +44,7 @@ no_response_count <- phone_data %>%
   summarize(
     q11 = sum(q11 < 0),
     q61 = sum(q61 < 0),
+    # filtering out ages younger than 18
     age = sum(age < 18)
   )
 
@@ -140,6 +145,30 @@ hist(phone_data_known$isced_level, main = "Historgram of ISCED_Level of 'Known' 
 
 These distributions are very similar, therefore, they could potentially be removed?
 
+```{r}
+library(dplyr)
+
+# Subset the data
+phone_data_known <- phone_data %>% filter(voting_choice != 'Unknown')
+phone_data_unknown <- phone_data %>% filter(voting_choice == 'Unknown')
+
+t_test_result <- t.test(phone_data_known$isced_level, 
+                        phone_data_unknown$isced_level, 
+                        var.equal = FALSE)
+print(t_test_result)
+
+# p < 0.05, meaning there is a significant difference between including the unkown values and not including the unknown values, so unknown values should be included. 
+```
+
+```{r}
+# converting voted_liberal to factor binary (Liberal = 1, Non-Liberal = 0)
+phone_data$voting_choice <- factor(phone_data$voting_choice, levels = c("Non Liberal", "Liberal"))
+
+# Ensure that ISCED level and age are numeric
+phone_data$isced_level <- as.numeric(phone_data$isced_level)
+phone_data$age <- as.numeric(phone_data$age)
+```
+
 # 3 Methods
 
 Include the formula for calculating the confidence interval for proportions (do not include specific numbers yet) and provide a description of its components. Present the logistic regression model, specifying the independent variables and expected interpretation of coefficients (parameters, not estimates), and describe the model. In this section you are preparing the reader for how to interpret the numbers displayed in the next section (Results).
@@ -150,7 +179,9 @@ $$\bar{X} \pm \chi_{\alpha/2} \sqrt{\frac{1+1}{n}}$$
 
 Be sure to include your logistic regression model, and a description of the components of the model.
 
-$$y = mx+ b$$
+$$
+\log\left(\frac{1-P(\text{Vote Liberal})}{P(\text{Vote Liberal})}\right)=\beta_0+\beta_1(\text{ISCED Level})+\beta_2(\text{Age})
+$$ where - $P(Vote Liberal)$ is the probability of voting for the Liberal party - $\beta_0$ is the intercept value - $\beta_1$ is the effect of ISCED Level (Education Level) on the log-odds of voting Liberal. - $\beta_2$ is the effect of Age on the log-odds of voting Liberal.
 
 # 4 Results
 
@@ -164,20 +195,45 @@ Present a table showing the estimated proportion of votes for the selected party
 
 In Table 1 I present both confidence intervals of....
 
-|              | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
-|----------------|-----------------------|---------------------------------|
-| Phone Survey | 0.34                           | (lower bound, upper bound)                  |
-| Web Survey   | 0.25                           | (lower bound, upper bound)                  |
+|   | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
+|------------------|-----------------------|-------------------------------|
+| Phone Survey | 0.34 | (lower bound, upper bound) |
+| Web Survey | 0.25 | (lower bound, upper bound) |
 
 : The proportions and 95% confidence intervals of outcome variable of interest calculated for both the Canadian Election Study 2019 phone and web survey data.
 
-Provide a table or formula of the estimated logistic regression model, and include text describing this table/formula and the key takeaways. Interpret the estimates from the logistic regression model. Specifically, commenting on how the predictor variables relate to the outcome variable.
+<!-- Provide a table or formula of the estimated logistic regression model, and include text describing this table/formula and the key takeaways. Interpret the estimates from the logistic regression model. Specifically, commenting on how the predictor variables relate to the outcome variable. -->
 
-Below is the estimate regression model....
+```{r, echo = FALSE}
+logit_model <- glm(voting_choice ~ isced_level + age, 
+                   data = phone_data, family = binomial)
 
-$$
-\hat{y} = 18x+3
-$$
+summary(logit_model)
+
+model_results <- tidy(logit_model) %>%
+  mutate(odds_ratio = exp(estimate)) %>%
+  select(term, estimate, std.error, p.value, odds_ratio)
+
+model_results
+```
+
+Below is the estimate regression model:
+
+|             | Estimate ($\beta$) | Standard Error | p-value      | odds_ratio |
+|-------------|--------------------|----------------|--------------|------------|
+| Intercept   | -2.133868375       | 0.205471620    | 2.894952e-25 | 0.1183785  |
+| ISCED Level | 0.173099360        | 0.028976671    | 2.318623e-09 | 1.1889842  |
+| Age         | 0.009854377        | 0.002408859    | 4.297219e-05 | 1.0099031  |
+
+```{r}
+(exp(-2.133868375))/(1-exp(-2.133868375))
+```
+
+For a person with no school on the ISCED scale (ISCED level = 0) and zero years old, the probability of them voting is around 13.43%. This is just a baseline variable, since anyone who is 0 years old cannot vote.
+
+$\beta_1$ is positive and p-value is \< 0.05, meaning that higher education is associated with higher odds of voting Liberal at significance level. The odds ratio is 1.19, meaning that for each one-unit increase in education level, the odds of voting Liberal increase by 19%.
+
+$\beta_2$ is positive with a value of 0.00985 and p-value is \< 0.05, meaning that older age is slightly associated with higher odds of voting Liberal. The odds ratio is 1.01, meaning that for each one-unit increase in education level, the odds of voting Liberal increase by 1%.
 
 # 5 Discussion
 
