@@ -74,7 +74,7 @@ phone_data <-
          voting_choice = case_when(
            phone_data$q11 == 1 ~ 'Liberal',
            phone_data$q11 < 0 ~ 'Unknown',
-           phone_data$q11 != 0 ~ 'Non Liberal'
+           phone_data$q11 != 1 ~ 'Non Liberal'
          ))
 
 ```
