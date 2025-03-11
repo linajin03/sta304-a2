@@ -125,7 +125,7 @@ summary(phone_data$age)
 
 From the summary statistics and graph, we can see that the survey population is decently well educated, with a mean ISCED score of around 5 and a median of 6. This means that the average survey respondent has at least been to community college. The ISCED_Level distribution appears to be left skewed, with the interquartile range from 4 to mostly 6 from the box plot and histogram. The age seems slightly right-skewed, with the interquartile range from late 30’s to early 60’s from the box plot, but has a higher range of ages from 18 to late 90’s. Among the web survey respondents, it shows a slight bi-modal distribution on the histogram, with the interquartile range from from late 30’s to early 60’s(maybe edit, I copy pasted this).
 
-We can make further comparisons on phone survey participants in the 'Unknown' category vs those who provided an answer.
+We can make further comparisons on phone survey participants in the 'Unknown' category with those who provided an answer.
 
 ```{r, echo = FALSE}
 phone_data_unknown <- phone_data %>% filter(voting_choice == 'Unknown')
