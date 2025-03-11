@@ -53,7 +53,7 @@ no_response_count <- phone_data %>%
 phone_data <- phone_data %>% filter(q61 > 0)
 ```
 
-Given that over 25% of phone survey participants chose not to say which party they were going to vote for in the upcoming election, I will generalize this category (q11) into 3 responses, 'Unknown', 'Liberal', and 'Not Liberal'. Removing all these observations could introduce bias into our analysis and decrease the significance of our results.
+Given that over 25% of phone survey participants chose not to say which party they were going to vote for in the upcoming election, we will generalize this category (q11) into 3 responses, 'Unknown', 'Liberal', and 'Not Liberal'. Removing all these observations could introduce bias into our analysis and decrease the significance of our results.
 
 ```{r, include = FALSE}
 
@@ -88,7 +88,7 @@ Plotting ISCED_Level (based on q61), and Voting preference (based on q11):
 
 ```{r, echo = FALSE}
 
-#Distribution of Isced Level
+#Distribution of ISCED Level
 
 hist(phone_data$isced_level, main = "Phone Data ISCED_Level Dsitribution", xlab = 'ISCED_Level', col = "darkred")
 
