@@ -23,7 +23,25 @@ In this section you will briefly describe your report. Explain the importance of
 
 # 2 Data
 
-Briefly introduce the data and key variables of interest. If you do any general data cleaning or data processing you should describe it (in a reproducible manner) here. Identify the stratification variable used. Include at least one plot displaying the distribution of the strata variable. If you do any data cleaning or data processing to the you should describe it (in a reproducible manner) in this section.
+For this project, we will be analyzing the phone survey data set to investigate if education level and age affect voting party preference. To do this, we will be stratifying our data into based on education level. To do this, we will be using the International Standard Classification of Education (ISCED) levels to group our participants based on their response to q61 in the Phone Data Dictionary which asks "What is the highest level of education that you have completed?"
+
+| Response                               | Corresponding ISCED Level | ISCED Level Definition                |
+|----------------------------------------|---------------------------|---------------------------------------|
+| No schooling                           | 0                         | Early childhood education             |
+| Some elementary school                 | 1                         | Primary education                     |
+| Completed elementary school            | 1                         | Primary education                     |
+| Some secondary/high school             | 2                         | Lower secondary education             |
+| Completed secondary/high school        | 3                         | Upper secondary education             |
+| Some technical, community college      | 4                         | Post-secondary non-tertiary education |
+| Completed technical, community college | 5                         | Short-cycle tertiary education        |
+| Some university                        | 6                         | Bachelor or equivalent level          |
+| Bachelor’s degree                      | 6                         | Bachelor or equivalent level          |
+| Master’s degree                        | 7                         | Master/PhD or equivalent level        |
+| Professional degree or doctorate       | 7                         | Master/PhD or equivalent level        |
+
+: Our mapping of Phone Data Dictionary Q61 to ISCED_Level and ISCED_Level meaning
+
+We used the above mapping to map respondent answers to ISCED Levels using the ISCED_Level variable. Respondents who picked the option ("Don't know", "Refused to answer" or "Skipped") were removed from the data set, with only 11 out of the over 4000 participants choosing this response. The other variables of interest were cleaned, where we removed all NA values and invalid voter ages (age \< 18). We used q11 to determine surveyor voting choice, where we grouped them into three categories: "Liberal" for those who said they would vote Liberal, "Not Liberal" for those who said they would vote for a party that was not the Liberal party, and "Unknown" for those who skipped the question or chose not to answer.
 
 ```{r, include = FALSE}
 #NA values in age, most likely to vote for (q11) and education level q(61)
@@ -185,13 +203,9 @@ Where:
 
 -   $Z_{\alpha/2}$ is the critical value from the standard normal distribution corresponding to a 95% confidence level ($\alpha = 0.05$)
 
-Below is the constructed logistic regression model:
-$$
+Below is the constructed logistic regression model: $$
 \log\left(\frac{1-P(\text{Vote Liberal})}{P(\text{Vote Liberal})}\right)=\beta_0+\beta_1(\text{ISCED Level})+\beta_2(\text{Age})
-$$
-The independent variables of the model are:
--   ISCED Level, the categorical variable encoding the respondent's education level
--   Age, discrete variable for the respondent's age
+$$ The independent variables of the model are: - ISCED Level, the categorical variable encoding the respondent's education level - Age, discrete variable for the respondent's age
 
 $P(Vote Liberal)$ describes the probability of the person voting for the Liberal party. The intercept value $\beta_0$ references the expected log-odds of a person with ISCED Level = 0 and age 0 to vote for the Liberal party. The interpretation is not relevant as a person of age 0 cannot vote. The coefficient $\beta_1$ identifies the expected effect of ISCED Level in log-odds of voting Liberal compared to the baseline education level (ISCED Level = 0) when Age is kept constant. $\beta_2$ is the expected effect of an unit change in Age on the log-odds of voting Liberal, when ISCED Level is kept constant.
 
