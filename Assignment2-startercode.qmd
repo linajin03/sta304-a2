@@ -160,28 +160,13 @@ phone_data_unknown <- phone_data %>% filter(voting_choice == 'Unknown')
 phone_data_known <- phone_data %>% filter(voting_choice == 'Liberal' | voting_choice == 'Non Liberal')
 
 #Unknown Dist
-hist(phone_data_unknown$isced_level, main = "Historgram of ISCED_Level of 'Unknown' Voting Preference", xlab = 'ISCED_Level', col = "black")
+hist(phone_data_unknown$isced_level, main = "Histogram of ISCED_Level of 'Unknown' Voting Preference", xlab = 'ISCED_Level', col = "black")
 
 #Known Dist
-hist(phone_data_known$isced_level, main = "Historgram of ISCED_Level of 'Known' Voting Preference", xlab = 'ISCED_Level', col = "brown")
+hist(phone_data_known$isced_level, main = "Histogram of ISCED_Level of 'Known' Voting Preference", xlab = 'ISCED_Level', col = "brown")
 ```
 
 These distributions are very similar, therefore, they could potentially be removed?
-
-```{r}
-library(dplyr)
-
-# Subset the data
-phone_data_known <- phone_data %>% filter(voting_choice != 'Unknown')
-phone_data_unknown <- phone_data %>% filter(voting_choice == 'Unknown')
-
-t_test_result <- t.test(phone_data_known$isced_level, 
-                        phone_data_unknown$isced_level, 
-                        var.equal = FALSE)
-print(t_test_result)
-
-# p < 0.05, meaning there is a significant difference between including the unkown values and not including the unknown values, so unknown values should be included. 
-```
 
 ```{r}
 # converting voted_liberal to factor binary (Liberal = 1, Non-Liberal = 0)
