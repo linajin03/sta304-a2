@@ -25,19 +25,19 @@ In this section you will briefly describe your report. Explain the importance of
 
 For this project, we will be analyzing the phone survey data set to investigate if education level and age affect voting party preference. To do this, we will be stratifying our data into based on education level. To do this, we will be using the International Standard Classification of Education (ISCED) levels to group our participants based on their response to q61 in the Phone Data Dictionary which asks "What is the highest level of education that you have completed?"
 
-| Response | Corresponding Education Level | ISCED Level Definition |
+| Response                               | Corresponding Education Level | ISCED Level Definition                |
 |---------------------------|-------------------|---------------------------|
-| No schooling | 0 | Early childhood education |
-| Some elementary school | 0 | Primary education |
-| Completed elementary school | 0 | Primary education |
-| Some secondary/high school | 0 | Lower secondary education |
-| Completed secondary/high school | 1 | Upper secondary education |
-| Some technical, community college | 1 | Post-secondary non-tertiary education |
-| Some university | 1 | Bachelor or equivalent level |
-| Completed technical, community college | 2 | Short-cycle tertiary education |
-| Bachelor’s degree | 3 | Bachelor or equivalent level |
-| Master’s degree | 4 | Master/PhD or equivalent level |
-| Professional degree or doctorate | 5 | Master/PhD or equivalent level |
+| No schooling                           | 0                             | Early childhood education             |
+| Some elementary school                 | 0                             | Primary education                     |
+| Completed elementary school            | 0                             | Primary education                     |
+| Some secondary/high school             | 0                             | Lower secondary education             |
+| Completed secondary/high school        | 1                             | Upper secondary education             |
+| Some technical, community college      | 1                             | Post-secondary non-tertiary education |
+| Some university                        | 1                             | Bachelor or equivalent level          |
+| Completed technical, community college | 2                             | Short-cycle tertiary education        |
+| Bachelor’s degree                      | 3                             | Bachelor or equivalent level          |
+| Master’s degree                        | 4                             | Master/PhD or equivalent level        |
+| Professional degree or doctorate       | 5                             | Master/PhD or equivalent level        |
 
 : Our mapping of Phone Data Dictionary Q61 to ISCED_Level and ISCED_Level meaning
 
@@ -79,16 +79,16 @@ Given that over 25% of phone survey participants chose not to say which party th
 # Data Cleaning: Convert q61 into ISCED
 isced_mapping <- c(
   '1' = 0,  # ISCED 0 -> No school
-  '2' = 1,  # ISCED 1 -> Some elem
-  '3' = 1,  # ISCED 1 -> Elem
-  '4' = 2,  # ISCED 2 -> Some high school
-  '5' = 3,  # ISCED 3 -> High school diploma
-  '6' = 4,  # ISCED 4 -> Some community colege
-  '7' = 5,  # ISCED 5 -> Community College
-  '8' = 6,  # ISCED 6 -> Some university
-  '9' = 6,  # ISCED 6 -> Bachelor
-  '10' = 7,  # ISCED 7 -> Master
-  '11' = 7  # ISCED 7 -> PHD
+  '2' = 0,  # ISCED 1 -> Some elem
+  '3' = 0,  # ISCED 1 -> Elem
+  '4' = 0,  # ISCED 2 -> Some high school
+  '5' = 1,  # ISCED 3 -> High school diploma
+  '6' = 1,  # ISCED 4 -> Some community colege
+  '7' = 2,  # ISCED 5 -> Community College
+  '8' = 1,  # ISCED 6 -> Some university
+  '9' = 3,  # ISCED 6 -> Bachelor
+  '10' = 4,  # ISCED 7 -> Master
+  '11' = 5  # ISCED 7 -> PHD
 )
 
 phone_data <- 
@@ -267,10 +267,10 @@ confint(svymean(~I(voting_choice == 'Liberal'), design=strata_design))
 
 In Table 1 I present the confidence intervals of phone surveys:
 
-|   | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
+|              | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
 |-------------------|-----------------------|------------------------------|
-| Phone Survey | 0.231 | (0.218, 0.244) |
-| Web Survey | 0.25 | (lower bound, upper bound) |
+| Phone Survey | 0.231                          | (0.218, 0.244)                              |
+| Web Survey   | 0.25                           | (lower bound, upper bound)                  |
 
 : The proportions and 95% confidence intervals of outcome variable of interest calculated for the Canadian Election Study 2019 phone survey data.
 
