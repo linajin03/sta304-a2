@@ -25,19 +25,19 @@ In this section you will briefly describe your report. Explain the importance of
 
 For this project, we will be analyzing the phone survey data set to investigate if education level and age affect voting party preference. To do this, we will be stratifying our data into based on education level. To do this, we will be using the International Standard Classification of Education (ISCED) levels to group our participants based on their response to q61 in the Phone Data Dictionary which asks "What is the highest level of education that you have completed?"
 
-| Response                               | Corresponding ISCED Level | ISCED Level Definition                |
-|----------------------------------------|---------------------------|---------------------------------------|
-| No schooling                           | 0                         | Early childhood education             |
-| Some elementary school                 | 1                         | Primary education                     |
-| Completed elementary school            | 1                         | Primary education                     |
-| Some secondary/high school             | 2                         | Lower secondary education             |
-| Completed secondary/high school        | 3                         | Upper secondary education             |
-| Some technical, community college      | 4                         | Post-secondary non-tertiary education |
-| Completed technical, community college | 5                         | Short-cycle tertiary education        |
-| Some university                        | 6                         | Bachelor or equivalent level          |
-| Bachelor’s degree                      | 6                         | Bachelor or equivalent level          |
-| Master’s degree                        | 7                         | Master/PhD or equivalent level        |
-| Professional degree or doctorate       | 7                         | Master/PhD or equivalent level        |
+| Response                               | Corresponding Education Level | ISCED Level Definition                |
+|---------------------------|-------------------|---------------------------|
+| No schooling                           | 0                             | Early childhood education             |
+| Some elementary school                 | 0                             | Primary education                     |
+| Completed elementary school            | 0                             | Primary education                     |
+| Some secondary/high school             | 0                             | Lower secondary education             |
+| Completed secondary/high school        | 1                             | Upper secondary education             |
+| Some technical, community college      | 1                             | Post-secondary non-tertiary education |
+| Some university                        | 1                             | Bachelor or equivalent level          |
+| Completed technical, community college | 2                             | Short-cycle tertiary education        |
+| Bachelor’s degree                      | 3                             | Bachelor or equivalent level          |
+| Master’s degree                        | 4                             | Master/PhD or equivalent level        |
+| Professional degree or doctorate       | 5                             | Master/PhD or equivalent level        |
 
 : Our mapping of Phone Data Dictionary Q61 to ISCED_Level and ISCED_Level meaning
 
@@ -189,17 +189,25 @@ phone_data$age <- as.numeric(phone_data$age)
 
 # 3 Methods
 
-To calculate the Confidence Interval for a proportion, the following formula will be used (Dekking 2005, p.364):
+To calculate the Confidence Interval for a proportion and stratified sampling, the following formula will be used:
 
 $$
-\hat{p} \pm Z_{\alpha/2} \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}}
-$$
+\hat{p} \pm z_{\alpha/2} \sqrt{\sum_{h=1}^{H} W_h^2 \left(1 - \frac{n_h}{N_h} \right) \frac{s_h^2}{n_h}}
+$$ Where $\hat{p} = \sum_{h=1}^{H} W_h \hat{p}_h$ and $W_h = \frac{N_h}{N}$
 
-Where:
+In the formula,
 
--   p̂ is the sample proportion of Liberal voters
+-   $H$ is the number of ISCED Level strata.
 
--   n is the sample size of the phone survey after cleaning
+-   $h$ denotes a specific stratum.
+
+-   $\hat{p}_h$ specifies the sample proportion of Liberal voters from the strata $h$.
+
+-   $N_h$ is the population size of the stratum $h$, with numbers from Statistics Canada (Statistics Canada, 2021).
+
+-   $n_h$ is the sample size of the stratum $h$.
+
+-   $s_h^2$ indicates the sample variance of the stratum $h$.
 
 -   $Z_{\alpha/2}$ is the critical value from the standard normal distribution corresponding to a 95% confidence level ($\alpha = 0.05$)
 
@@ -217,12 +225,35 @@ Present a table showing the estimated proportion of votes for the selected party
 
 # Here you can run code to calculate your Confidence Intervals.
 
-p_liberals <- mean(phone_data$q11 == 1, na.rm = TRUE)
-n_phone <- nrow(phone_data)
-z <- 1.96
+library(survey)
 
-se_liberals <- sqrt((p_liberals * (1 - p_liberals)) / n_phone)
-ci_Liberals <- c(p_liberals - z * se_liberals, p_liberals + z * se_liberals)
+# Calculate the sample size for each statum
+strata_sample_size <- numeric(8)
+for (level in 0:7) {
+  strata_sample_size[level+1] <- sum(phone_data$isced_level == level)
+}
+
+# population size derived from Statistics Canada
+phone_data <- phone_data %>% 
+  mutate(pop_fpc = case_when(isced_level == 0 ~ 0,
+                             isced_level == 1 ~ 0,
+                             isced_level == 2 ~ 0,
+                             isced_level == 3 ~ 8097295,
+                             isced_level == 4 ~ 0,
+                             isced_level == 5 ~ 5714490,
+                             isced_level == 6 ~ 5295360,
+                             isced_level == 7 ~ 1740605+279660)) %>%
+  mutate(samp_wt = case_when(isced_level == 0 ~ 0/strata_sample_size[1],
+                             isced_level == 1 ~ 0/strata_sample_size[2],
+                             isced_level == 2 ~ 0/strata_sample_size[3],
+                             isced_level == 3 ~ 0/strata_sample_size[4],
+                             isced_level == 4 ~ 0/strata_sample_size[5],
+                             isced_level == 5 ~ 0/strata_sample_size[6],
+                             isced_level == 6 ~ 0/strata_sample_size[7],
+                             isced_level == 7 ~ 0/strata_sample_size[8]))
+
+strata_design <- svydesign(id=~1, strata=~isced_level, weights=~samp_wt, fpc=~pop_fpc, data=phone_data)
+confint(svymean(~I(voting_choice == 'Liberal'), design=strata_design))
 ```
 
 In Table 1 I present the confidence intervals of phone surveys:
