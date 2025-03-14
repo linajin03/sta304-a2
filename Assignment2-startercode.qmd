@@ -290,21 +290,18 @@ summary(logit_model)
 
 Below is the estimate regression model:
 
-|             | Estimate ($\beta$) | Standard Error | p-value      | odds_ratio |
-|-------------|--------------------|----------------|--------------|------------|
-| Intercept   | -2.133868375       | 0.205471620    | 2.894952e-25 | 0.1183785  |
-| ISCED Level | 0.173099360        | 0.028976671    | 2.318623e-09 | 1.1889842  |
-| Age         | 0.009854377        | 0.002408859    | 4.297219e-05 | 1.0099031  |
+|             | Estimate ($\beta$) | Standard Error | p-value      |
+|-------------|--------------------|----------------|--------------|
+| Intercept   | -2.373643       | 0.163359    | < 2e-16 *** |
+| ISCED Level | 0.208224        | 0.038918    | 9.28e-08 *** |
+| Age         | 0.012804        | 0.002728    | 2.77e-06 *** |
 
-```{r}
-(exp(-2.373643))/(1-exp(-2.373643))
-```
 
-Accounting for stratification, for a person with no school on the ISCED scale (ISCED level = 0) and zero years old, the probability of them voting is around 10.27%. This is just a baseline variable, since anyone who is 0 years old cannot vote.
+Accounting for stratification, -2.373643 is the log-odds intercept for a person with no school on the ISCED scale (ISCED level = 0) and zero years old. This is just a baseline variable, since anyone who is 0 years old cannot vote.
 
-$\beta_1$ is positive and p-value is \< 0.05, meaning that higher education is associated with higher odds of voting Liberal at significance level. The odds ratio is 0.175318, meaning that for each one-unit increase in education level, the odds of voting Liberal increase by 17.5%.
+$\beta_1$ is positive and p-value is < 0.05, meaning that higher education is associated with higher odds of voting Liberal at significance level. The log odds is 0.208224, meaning that for each one-unit increase in education level, the log-odds of voting Liberal increase by around 20.8%.
 
-$\beta_2$ is positive with a value of 0.008402 and p-value is \< 0.05, meaning that older age is slightly associated with higher odds of voting Liberal. The odds ratio is , meaning that for each one-unit increase in age, the odds of voting Liberal increases by 0.8%.
+$\beta_2$ is positive with a log-odds value of 0.012804 and p-value is < 0.05, meaning that older age is slightly associated with higher log-odds of voting Liberal.
 
 # 5 Discussion
 
