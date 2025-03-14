@@ -23,25 +23,7 @@ In this section you will briefly describe your report. Explain the importance of
 
 # 2 Data
 
-For this project, we will be analyzing the phone survey data set to investigate if education level and age affect voting party preference. To do this, we will be stratifying our data into based on education level. To do this, we will be using the International Standard Classification of Education (ISCED) levels to group our participants based on their response to q61 in the Phone Data Dictionary which asks "What is the highest level of education that you have completed?"
-
-| Response                               | Corresponding Education Level | ISCED Level Definition                |
-|---------------------------|-------------------|---------------------------|
-| No schooling                           | 0                             | Early childhood education             |
-| Some elementary school                 | 0                             | Primary education                     |
-| Completed elementary school            | 0                             | Primary education                     |
-| Some secondary/high school             | 0                             | Lower secondary education             |
-| Completed secondary/high school        | 1                             | Upper secondary education             |
-| Some technical, community college      | 1                             | Post-secondary non-tertiary education |
-| Some university                        | 1                             | Bachelor or equivalent level          |
-| Completed technical, community college | 2                             | Short-cycle tertiary education        |
-| Bachelor’s degree                      | 3                             | Bachelor or equivalent level          |
-| Master’s degree                        | 4                             | Master/PhD or equivalent level        |
-| Professional degree or doctorate       | 5                             | Master/PhD or equivalent level        |
-
-: Our mapping of Phone Data Dictionary Q61 to ISCED_Level and ISCED_Level meaning
-
-We used the above mapping to map respondent answers to ISCED Levels using the ISCED_Level variable. Respondents who picked the option ("Don't know", "Refused to answer" or "Skipped") were removed from the data set, with only 11 out of the over 4000 participants choosing this response. The other variables of interest were cleaned, where we removed all NA values and invalid voter ages (age \< 18). We used q11 to determine surveyor voting choice, where we grouped them into three categories: "Liberal" for those who said they would vote Liberal, "Not Liberal" for those who said they would vote for a party that was not the Liberal party, and "Unknown" for those who skipped the question or chose not to answer.
+Briefly introduce the data and key variables of interest. If you do any general data cleaning or data processing you should describe it (in a reproducible manner) here. Identify the stratification variable used. Include at least one plot displaying the distribution of the strata variable. If you do any data cleaning or data processing to the you should describe it (in a reproducible manner) in this section.
 
 ```{r, include = FALSE}
 #NA values in age, most likely to vote for (q11) and education level q(61)
@@ -79,26 +61,27 @@ Given that over 25% of phone survey participants chose not to say which party th
 # Data Cleaning: Convert q61 into ISCED
 isced_mapping <- c(
   '1' = 0,  # ISCED 0 -> No school
-  '2' = 0,  # ISCED 1 -> Some elem
-  '3' = 0,  # ISCED 1 -> Elem
-  '4' = 0,  # ISCED 2 -> Some high school
-  '5' = 1,  # ISCED 3 -> High school diploma
-  '6' = 1,  # ISCED 4 -> Some community college
-  '7' = 2,  # ISCED 5 -> Community College
-  '8' = 1,  # ISCED 6 -> Some university
-  '9' = 3,  # ISCED 6 -> Bachelor
-  '10' = 4,  # ISCED 7 -> Master
-  '11' = 5  # ISCED 7 -> PHD
+  '2' = 1,  # ISCED 1 -> Some elem
+  '3' = 1,  # ISCED 1 -> Elem
+  '4' = 2,  # ISCED 2 -> Some high school
+  '5' = 3,  # ISCED 3 -> High school diploma
+  '6' = 4,  # ISCED 4 -> Some community college
+  '7' = 5,  # ISCED 5 -> Community College
+  '8' = 6,  # ISCED 6 -> Some university
+  '9' = 6,  # ISCED 6 -> Bachelor
+  '10' = 7,  # ISCED 7 -> Master
+  '11' = 7  # ISCED 7 -> PHD
 )
 
-phone_data <- 
-  phone_data %>%
-  mutate(isced_level = isced_mapping[as.character(phone_data$q61)],
-         voting_choice = case_when(
-           phone_data$q11 == 1 ~ 'Liberal',
-           phone_data$q11 < 0 ~ 'Unknown',
-           phone_data$q11 != 1 ~ 'Non Liberal'
-         ))
+phone_data <- phone_data %>%
+  mutate(q10 = case_when(
+    q10 == -9 ~ -1, # Change -9. Don't know to -1,
+    q10 == -8 ~ -1, # Change -8. Refused to -1
+    q10 == -7 ~ -1, # Change -7. Skipped to -1
+    q10 == 5 ~ 0, # Change 5. I voted in an advance poll to 0
+    TRUE ~ q10 # keep other values unchanged
+  ))
+
 
 ```
 
@@ -108,12 +91,7 @@ Plotting ISCED_Level (based on q61), and Voting preference (based on q11):
 
 #Distribution of Isced Level
 
-barplot(table(phone_data$isced_level),
-        main = "Phone Data ISCED Level Distribution",
-        xlab = "ISCED Level",
-        ylab = "Frequency",
-        col = "darkred",
-        las = 2) 
+hist(phone_data$isced_level, main = "Phone Data ISCED_Level Dsitribution", xlab = 'ISCED_Level', col = "darkred")
 
 boxplot(phone_data$isced_level,
         main = "Phone Data ISCED_Level Boxplot")
@@ -160,13 +138,28 @@ phone_data_unknown <- phone_data %>% filter(voting_choice == 'Unknown')
 phone_data_known <- phone_data %>% filter(voting_choice == 'Liberal' | voting_choice == 'Non Liberal')
 
 #Unknown Dist
-hist(phone_data_unknown$isced_level, main = "Histogram of ISCED_Level of 'Unknown' Voting Preference", xlab = 'ISCED_Level', col = "black")
+hist(phone_data_unknown$isced_level, main = "Historgram of ISCED_Level of 'Unknown' Voting Preference", xlab = 'ISCED_Level', col = "black")
 
 #Known Dist
-hist(phone_data_known$isced_level, main = "Histogram of ISCED_Level of 'Known' Voting Preference", xlab = 'ISCED_Level', col = "brown")
+hist(phone_data_known$isced_level, main = "Historgram of ISCED_Level of 'Known' Voting Preference", xlab = 'ISCED_Level', col = "brown")
 ```
 
 These distributions are very similar, therefore, they could potentially be removed?
+
+```{r}
+library(dplyr)
+
+# Subset the data
+phone_data_known <- phone_data %>% filter(voting_choice != 'Unknown')
+phone_data_unknown <- phone_data %>% filter(voting_choice == 'Unknown')
+
+t_test_result <- t.test(phone_data_known$isced_level, 
+                        phone_data_unknown$isced_level, 
+                        var.equal = FALSE)
+print(t_test_result)
+
+# p < 0.05, meaning there is a significant difference between including the unkown values and not including the unknown values, so unknown values should be included. 
+```
 
 ```{r}
 # converting voted_liberal to factor binary (Liberal = 1, Non-Liberal = 0)
@@ -188,25 +181,17 @@ phone_data <- phone_data %>%
 
 # 3 Methods
 
-To calculate the Confidence Interval for a proportion and stratified sampling, the following formula will be used:
+To calculate the Confidence Interval for a proportion, the following formula will be used (Dekking 2005, p.364):
 
 $$
-\hat{p} \pm z_{\alpha/2} \sqrt{\sum_{h=1}^{H} W_h^2 \left(1 - \frac{n_h}{N_h} \right) \frac{s_h^2}{n_h}}
-$$ Where $\hat{p} = \sum_{h=1}^{H} W_h \hat{p}_h$ and $W_h = \frac{N_h}{N}$
+\hat{p} \pm Z_{\alpha/2} \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}}
+$$
 
-In the formula,
+Where:
 
--   $H$ is the number of ISCED Level strata.
+-   p̂ is the sample proportion of Liberal voters
 
--   $h$ denotes a specific stratum.
-
--   $\hat{p}_h$ specifies the sample proportion of Liberal voters from the strata $h$.
-
--   $N_h$ is the population size of the stratum $h$, with numbers from Statistics Canada (Statistics Canada, 2021).
-
--   $n_h$ is the sample size of the stratum $h$.
-
--   $s_h^2$ indicates the sample variance of the stratum $h$.
+-   n is the sample size of the phone survey after cleaning
 
 -   $Z_{\alpha/2}$ is the critical value from the standard normal distribution corresponding to a 95% confidence level ($\alpha = 0.05$)
 
@@ -222,68 +207,56 @@ Present a table showing the estimated proportion of votes for the selected party
 
 ```{r, include = FALSE}
 
-# Here you can run code to calculate your Confidence Intervals.
-
 library(survey)
 
-# Calculate the sample size for each statum
-strata_sample_size <- numeric(6)
-for (level in 0:5) {
-  strata_sample_size[level+1] <- sum(phone_data$isced_level == level)
-}
+# Define the survey design
+design <- svydesign(id = ~1, strata = ~isced_level, data = phone_data)
 
-# population size derived from Statistics Canada
-phone_data <- phone_data %>% 
-  mutate(pop_fpc = case_when(isced_level == 0 ~ 4899580, # No diploma
-                             isced_level == 1 ~ 8097295, # High school diploma
-                             isced_level == 2 ~ 9252800, # Postsecondary below Bachelor
-                             isced_level == 3 ~ 5295360, # Bachelor diploma
-                             isced_level == 4 ~ 1740605, # Master's diploma
-                             isced_level == 5 ~ 279660)) %>% # Doctorate
-  mutate(samp_wt = case_when(isced_level == 0 ~ 4899580/strata_sample_size[1],
-                             isced_level == 1 ~ 8097295/strata_sample_size[2],
-                             isced_level == 2 ~ 9252800/strata_sample_size[3],
-                             isced_level == 3 ~ 5295360/strata_sample_size[4],
-                             isced_level == 4 ~ 1740605/strata_sample_size[5],
-                             isced_level == 5 ~ 279660/strata_sample_size[6]))
+p_liberals <- mean(phone_data$voting_choice == "Liberal", na.rm = TRUE)
+n_phone <- nrow(phone_data)
+z <- 1.96
 
-strata_design <- svydesign(id=~1, strata=~isced_level, weights=~samp_wt, fpc=~pop_fpc, data=phone_data)
+se_liberals <- sqrt((p_liberals * (1 - p_liberals)) / n_phone)
+ci_Liberals <- c(p_liberals - z * se_liberals, p_liberals + z * se_liberals)
 
-svymean(~voting_choice, design=strata_design)
-confint(svymean(~voting_choice, design=strata_design))
 ```
 
 In Table 1 I present the confidence intervals of phone surveys:
 
-|              | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
-|-------------------|-----------------------|------------------------------|
-| Phone Survey | 0.20914                          | (0.1950576, 0.2232315)                              |
+|   | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
+|----|----|----|
+| Phone Survey | 0.231 | (0.218, 0.244) |
+| Web Survey | 0.25 | (lower bound, upper bound) |
 
 : The proportions and 95% confidence intervals of outcome variable of interest calculated for the Canadian Election Study 2019 phone survey data.
 
 <!-- Provide a table or formula of the estimated logistic regression model, and include text describing this table/formula and the key takeaways. Interpret the estimates from the logistic regression model. Specifically, commenting on how the predictor variables relate to the outcome variable. -->
 
 ```{r, echo = FALSE}
+
 logit_model <- svyglm(voting_choice ~ isced_level + age, 
-                      design = strata_design, 
+                      design = design, 
                       family = binomial)
 summary(logit_model)
 ```
 
 Below is the estimate regression model:
 
-|             | Estimate ($\beta$) | Standard Error | p-value      |
-|-------------|--------------------|----------------|--------------|
-| Intercept   | -2.373643       | 0.163359    | < 2e-16 *** |
-| ISCED Level | 0.208224        | 0.038918    | 9.28e-08 *** |
-| Age         | 0.012804        | 0.002728    | 2.77e-06 *** |
+| Variable    | Estimate  | Std. Error | t value | Pr(\>           |
+|-------------|-----------|------------|---------|-----------------|
+| (Intercept) | -2.555249 | 0.191481   | -13.345 | \< 2e-16 \*\*\* |
+| isced_level | 0.175318  | 0.028375   | 6.179   | 7.12e-10 \*\*\* |
+| age         | 0.008402  | 0.002358   | 3.563   | 0.000371 \*\*\* |
 
+```{r}
+(exp(-2.133868375))/(1-exp(-2.133868375))
+```
 
-Accounting for stratification, -2.373643 is the log-odds intercept for a person with no school on the ISCED scale (ISCED level = 0) and zero years old. This is just a baseline variable, since anyone who is 0 years old cannot vote.
+Accounting for stratification, for a person with no school on the ISCED scale (ISCED level = 0) and zero years old, the probability of them voting is around -0.4815%. This is just a baseline variable, since anyone who is 0 years old cannot vote.
 
-$\beta_1$ is positive and p-value is < 0.05, meaning that higher education is associated with higher odds of voting Liberal at significance level. The log odds is 0.208224, meaning that for each one-unit increase in education level, the log-odds of voting Liberal increase by around 20.8%.
+$\beta_1$ is positive and p-value is \< 0.05, meaning that higher education is associated with higher odds of voting Liberal at significance level. The odds ratio is 0.175318, meaning that for each one-unit increase in education level, the odds of voting Liberal increase by 17.5%.
 
-$\beta_2$ is positive with a log-odds value of 0.012804 and p-value is < 0.05, meaning that older age is slightly associated with higher log-odds of voting Liberal.
+$\beta_2$ is positive with a value of 0.008402 and p-value is \< 0.05, meaning that older age is slightly associated with higher odds of voting Liberal. The odds ratio is , meaning that for each one-unit increase in age, the odds of voting Liberal increases by 0.8%.
 
 # 5 Discussion
 
