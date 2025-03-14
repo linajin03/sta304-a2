@@ -83,7 +83,7 @@ isced_mapping <- c(
   '3' = 0,  # ISCED 1 -> Elem
   '4' = 0,  # ISCED 2 -> Some high school
   '5' = 1,  # ISCED 3 -> High school diploma
-  '6' = 1,  # ISCED 4 -> Some community colege
+  '6' = 1,  # ISCED 4 -> Some community college
   '7' = 2,  # ISCED 5 -> Community College
   '8' = 1,  # ISCED 6 -> Some university
   '9' = 3,  # ISCED 6 -> Bachelor
@@ -237,40 +237,37 @@ Present a table showing the estimated proportion of votes for the selected party
 library(survey)
 
 # Calculate the sample size for each statum
-strata_sample_size <- numeric(8)
-for (level in 0:7) {
+strata_sample_size <- numeric(6)
+for (level in 0:5) {
   strata_sample_size[level+1] <- sum(phone_data$isced_level == level)
 }
 
 # population size derived from Statistics Canada
 phone_data <- phone_data %>% 
-  mutate(pop_fpc = case_when(isced_level == 0 ~ 0,
-                             isced_level == 1 ~ 0,
-                             isced_level == 2 ~ 0,
-                             isced_level == 3 ~ 8097295,
-                             isced_level == 4 ~ 0,
-                             isced_level == 5 ~ 5714490,
-                             isced_level == 6 ~ 5295360,
-                             isced_level == 7 ~ 1740605+279660)) %>%
-  mutate(samp_wt = case_when(isced_level == 0 ~ 0/strata_sample_size[1],
-                             isced_level == 1 ~ 0/strata_sample_size[2],
-                             isced_level == 2 ~ 0/strata_sample_size[3],
-                             isced_level == 3 ~ 0/strata_sample_size[4],
-                             isced_level == 4 ~ 0/strata_sample_size[5],
-                             isced_level == 5 ~ 0/strata_sample_size[6],
-                             isced_level == 6 ~ 0/strata_sample_size[7],
-                             isced_level == 7 ~ 0/strata_sample_size[8]))
+  mutate(pop_fpc = case_when(isced_level == 0 ~ 4899580, # No diploma
+                             isced_level == 1 ~ 8097295, # High school diploma
+                             isced_level == 2 ~ 9252800, # Postsecondary below Bachelor
+                             isced_level == 3 ~ 5295360, # Bachelor diploma
+                             isced_level == 4 ~ 1740605, # Master's diploma
+                             isced_level == 5 ~ 279660)) %>% # Doctorate
+  mutate(samp_wt = case_when(isced_level == 0 ~ 4899580/strata_sample_size[1],
+                             isced_level == 1 ~ 8097295/strata_sample_size[2],
+                             isced_level == 2 ~ 9252800/strata_sample_size[3],
+                             isced_level == 3 ~ 5295360/strata_sample_size[4],
+                             isced_level == 4 ~ 1740605/strata_sample_size[5],
+                             isced_level == 5 ~ 279660/strata_sample_size[6]))
 
 strata_design <- svydesign(id=~1, strata=~isced_level, weights=~samp_wt, fpc=~pop_fpc, data=phone_data)
-confint(svymean(~I(voting_choice == 'Liberal'), design=strata_design))
+
+svymean(~voting_choice, design=strata_design)
+confint(svymean(~voting_choice, design=strata_design))
 ```
 
 In Table 1 I present the confidence intervals of phone surveys:
 
 |              | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
 |-------------------|-----------------------|------------------------------|
-| Phone Survey | 0.231                          | (0.218, 0.244)                              |
-| Web Survey   | 0.25                           | (lower bound, upper bound)                  |
+| Phone Survey | 0.20914                          | (0.1950576, 0.2232315)                              |
 
 : The proportions and 95% confidence intervals of outcome variable of interest calculated for the Canadian Election Study 2019 phone survey data.
 
