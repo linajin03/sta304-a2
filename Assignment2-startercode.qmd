@@ -23,7 +23,7 @@ In this section you will briefly describe your report. Explain the importance of
 
 # 2 Data
 
-For this project, we will be analyzing the phone survey data set to investigate if education level and age affect voting party preference. To do this, we will be stratifying our data into based on education level. To do this, we will be using the International Standard Classification of Education (ISCED) levels to group our participants based on their response to q61 in the Phone Data Dictionary which asks "What is the highest level of education that you have completed?"
+For this project, we will be analyzing the phone survey data set to investigate if education level and age affect voting party preference. To do this, we will be stratifying our data into based on education level, using International Standard Classification of Education (ISCED) levels (Government of Canada, Statistics Canada, 2023) and the Government of Canada 2021 Census Education categories (Government of Canada, Statistics Canada, 2021) as a reference to group our participants based on their response to q61 in the Phone Data Dictionary which asks "What is the highest level of education that you have completed?". By stratifying the sample, we are able to improve the precision of our estimates by accounting for within-group variations of education levels.
 
 | Response | Corresponding Education Level | ISCED Level Definition |
 |---------------------------|-------------------|---------------------------|
@@ -130,7 +130,7 @@ boxplot(phone_data$age,
         main = "Phone Data Age Boxplot")
 ```
 
-```{r, echo=False}
+```{r, echo=FALSE}
 #Bar plot of liberal voters
 ggplot(vote_counts, aes(x = voting_choice, y = count, fill = voting_choice)) +
   geom_bar(stat = "identity") +  # Create bar graph
@@ -171,22 +171,7 @@ hist(phone_data_known$isced_level, main = "Historgram of ISCED_Level of 'Known' 
 
 These distributions are very similar, therefore, they could be removed without introducing bias into our data.
 
-```{r}
-library(dplyr)
-
-# Subset the data
-phone_data_known <- phone_data %>% filter(voting_choice != 'Unknown')
-phone_data_unknown <- phone_data %>% filter(voting_choice == 'Unknown')
-
-t_test_result <- t.test(phone_data_known$isced_level, 
-                        phone_data_unknown$isced_level, 
-                        var.equal = FALSE)
-print(t_test_result)
-
-# p < 0.05, meaning there is a significant difference between including the unkown values and not including the unknown values, so unknown values should be included. 
-```
-
-```{r}
+```{r, echo=FALSE}
 # converting voted_liberal to factor binary (Liberal = 1, Non-Liberal = 0)
 phone_data$voting_choice <- factor(phone_data$voting_choice, levels = c("Non Liberal", "Liberal"))
 
@@ -214,7 +199,7 @@ $$ Where $\hat{p} = \sum_{h=1}^{H} W_h \hat{p}_h$ and $W_h = \frac{N_h}{N}$
 
 In the formula,
 
--   $H$ is the number of ISCED Level strata.
+-   $H$ is the number of Education Level strata.
 
 -   $h$ denotes a specific stratum.
 
@@ -229,10 +214,18 @@ In the formula,
 -   $Z_{\alpha/2}$ is the critical value from the standard normal distribution corresponding to a 95% confidence level ($\alpha = 0.05$)
 
 Below is the constructed logistic regression model: $$
-\log\left(\frac{1-P(\text{Vote Liberal})}{P(\text{Vote Liberal})}\right)=\beta_0+\beta_1(\text{ISCED Level})+\beta_2(\text{Age})
-$$ The independent variables of the model are: - ISCED Level, the categorical variable encoding the respondent's education level - Age, discrete variable for the respondent's age
+\log\left(\frac{1-P(\text{Vote Liberal})}{P(\text{Vote Liberal})}\right)=\beta_0+\beta_1(\text{Education Level})+\beta_2(\text{Age})
+$$
 
-$P(Vote Liberal)$ describes the probability of the person voting for the Liberal party. The intercept value $\beta_0$ references the expected log-odds of a person with ISCED Level = 0 and age 0 to vote for the Liberal party. The interpretation is not relevant as a person of age 0 cannot vote. The coefficient $\beta_1$ identifies the expected effect of ISCED Level in log-odds of voting Liberal compared to the baseline education level (ISCED Level = 0) when Age is kept constant. $\beta_2$ is the expected effect of an unit change in Age on the log-odds of voting Liberal, when ISCED Level is kept constant.
+-   Education Level, the ordinal variable that the population is stratified by, defining the respondent's education level
+
+-   Age, discrete variable for the respondent's age
+
+-   $P(Vote Liberal)$ describes the probability of the person voting for the Liberal party. The intercept value $\beta_0$ references the expected log-odds of a person with Education Level = 0 and age 0 to vote for the Liberal party. The interpretation is not relevant as a person of age 0 cannot vote.
+
+-   The coefficient $\beta_1$ identifies the expected effect of Education Level in log-odds of voting Liberal compared to the baseline education level (ISCED Level = 0) when Age is kept constant.
+
+-   $\beta_2$ is the expected effect of an unit change in Age on the log-odds of voting Liberal, when Education Level is kept constant.
 
 # 4 Results
 
@@ -285,23 +278,21 @@ In Table 1 I present the confidence intervals of phone surveys:
 logit_model <- svyglm(voting_choice ~ isced_level + age, 
                       design = strata_design, 
                       family = binomial)
-summary(logit_model)
 ```
 
 Below is the estimate regression model:
 
-|             | Estimate ($\beta$) | Standard Error | p-value      |
-|-------------|--------------------|----------------|--------------|
-| Intercept   | -2.373643       | 0.163359    | < 2e-16 *** |
-| ISCED Level | 0.208224        | 0.038918    | 9.28e-08 *** |
-| Age         | 0.012804        | 0.002728    | 2.77e-06 *** |
-
+|             | Estimate ($\beta$) | Standard Error | p-value         |
+|-------------|--------------------|----------------|-----------------|
+| Intercept   | -2.373643          | 0.163359       | \< 2e-16 \*\*\* |
+| ISCED Level | 0.208224           | 0.038918       | 9.28e-08 \*\*\* |
+| Age         | 0.012804           | 0.002728       | 2.77e-06 \*\*\* |
 
 Accounting for stratification, -2.373643 is the log-odds intercept for a person with no school on the ISCED scale (ISCED level = 0) and zero years old. This is just a baseline variable, since anyone who is 0 years old cannot vote.
 
-$\beta_1$ is positive and p-value is < 0.05, meaning that higher education is associated with higher odds of voting Liberal at significance level. The log odds is 0.208224, meaning that for each one-unit increase in education level, the log-odds of voting Liberal increase by around 20.8%.
+$\beta_1$ is positive and p-value is \< 0.05, meaning that higher education is associated with higher odds of voting Liberal at significance level. The log odds is 0.208224, meaning that for each one-unit increase in education level, the log-odds of voting Liberal increase by around 20.8%.
 
-$\beta_2$ is positive with a log-odds value of 0.012804 and p-value is < 0.05, meaning that older age is slightly associated with higher log-odds of voting Liberal.
+$\beta_2$ is positive with a log-odds value of 0.012804 and p-value is \< 0.05, meaning that older age is slightly associated with higher log-odds of voting Liberal.
 
 # 5 Discussion
 
@@ -323,11 +314,15 @@ Since the CES 2019 data is publicly available, describe whether or not this the 
 
 # 8 Bibliography
 
-1.  Grolemund, G. (2014, July 16) *Introduction to R Markdown*. RStudio. <https://rmarkdown.rstudio.com/articles_intro.html>. (Last Accessed: April 4, 1991)
+1.  Government of Canada, Statistics Canada. “Census Profile, 2021 Census of Populationprofile Table.” *Profile Table, Census Profile, 2021 Census of Population - Canada \[Country\]*, 2 Aug. 2024, www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/page.cfm?LANG=E&GENDERlist=1%2C2%2C3&STATISTIClist=1%2C4&DGUIDlist=2021A000011124&HEADERlist=37&SearchText=Canada.
 
-2.  Dekking, F. M., et al. (2005) *A Modern Introduction to Probability and Statistics: Understanding why and how.* Springer Science & Business Media.
+2.  Government of Canada, Statistics Canada. “International Standard Classification of Education (ISCED).” *Government of Canada, Statistics Canada*, 29 June 2023, www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=1275152.
 
-3.  Allaire, J.J., et. el. *References: Introduction to R Markdown*. RStudio. <https://rmarkdown.rstudio.com/docs/>. (Last Accessed: April 4, 1991)
+3.  Grolemund, G. (2014, July 16) *Introduction to R Markdown*. RStudio. <https://rmarkdown.rstudio.com/articles_intro.html>. (Last Accessed: April 4, 1991)
+
+4.  Dekking, F. M., et al. (2005) *A Modern Introduction to Probability and Statistics: Understanding why and how.* Springer Science & Business Media.
+
+5.  Allaire, J.J., et. el. *References: Introduction to R Markdown*. RStudio. <https://rmarkdown.rstudio.com/docs/>. (Last Accessed: April 4, 1991)
 
 \newpage
 
