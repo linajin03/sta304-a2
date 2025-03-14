@@ -1,13 +1,13 @@
 {
     "sortOrder": [
         {
-            "columnIndex": 4,
+            "columnIndex": 2,
             "ascending": false
         },
         {
-            "columnIndex": 2,
-            "ascending": true
+            "columnIndex": 4,
+            "ascending": false
         }
     ],
-    "path": "~/Documents/STA304/sta304-a2"
+    "path": "~/Desktop/STA304/A1/sta304-a1"
 }

@@ -1,5 +1,5 @@
 ---
-title: "ADD IN MEANINGFUL TITLE HERE"
+title: "Education, Age, and the Liberal Vote: A Stratified Analysis of Canadian Voter Preferences"
 author: "Group 24: You Yu Fu, Eric Guo, Finn Tran, Lina Jin"
 subtitle: "STA304 - Winter 2025 - Assignment 2"
 format: pdf
@@ -19,13 +19,23 @@ phone_data <- read_csv("ces_phone.csv")
 
 # 1 Introduction
 
-In this section you will briefly describe your report. Explain the importance of the subsequent analysis and prepare the reader for what they will read in the subsequent sections. Provide an overview of the research question. Briefly describe the 2019 Canadian Federal Election Study and its relevance. State the purpose and goals/hypotheses of the report.
+<!-- In this section you will briefly describe your report. Explain the importance of the subsequent analysis and prepare the reader for what they will read in the subsequent sections. Provide an overview of the research question. Briefly describe the 2019 Canadian Federal Election Study and its relevance. State the purpose and goals/hypotheses of the report. -->
+
+Education, in general, has a significant impact on the development of the human brain. Prior research tells us, through various curriculums, education has exposed us to various ideologies and attitudes that ultimately shape our individual opinions (Leś, 2024), which in turn, links education’s role in political views and involvement (Hooghe et al., 2015). Studies have shown that an individual’s level of education is influential on their political views (Scott, 2022), and that those with a higher level of education tend to gravitate towards left-leaning views of the liberal and New Democratic Party (NDP) views rather than their right-leaning counterparts (Kiss et al., 2023). Though, to what extent does education level affect the voting behaviours of Canadian Liberals, when controlling for age?
+
+In our study, we hope to focus our landscape on the Canadian Liberal Party, to see whether or not the level of education impacts the voting patterns of Canadian liberals, utilizing the 2019 Canadian Federal Election Study, which is a survey intended to gather Canadians' opinions and thoughts before and after the 2019 Canadian Federal Election. The target population is Canadians aged 18 or older. The frame population is Canadians of or over the age of 18 with access to a phone in the database. The sampling population are the Canadians who voluntarily took the survey via phone. This gives us an insight into the patterns of Canadian voters and what thoughts, motivations, interests, accompany these voters during social, economic, and political issues.
+
+If our findings reflect the findings of these papers, what does a more-educated, left-learning voting pattern of citizens say about the educational system of Canada? By examining Liberal voting behaviour based on age and stratified by education level, we aim to assess whether higher education is a strong predictor of Liberal voting patterns in Canada and encourage discussions on how education shapes political engagement in Canadian society.
 
 # 2 Data
 
-For this project, we will be analyzing the phone survey data set to investigate if education level and age affect voting party preference. To do this, we will be stratifying our data into based on education level, using International Standard Classification of Education (ISCED) levels (Government of Canada, Statistics Canada, 2023) and the Government of Canada 2021 Census Education categories (Government of Canada, Statistics Canada, 2021) as a reference to group our participants based on their response to q61 in the Phone Data Dictionary which asks "What is the highest level of education that you have completed?". By stratifying the sample, we are able to improve the precision of our estimates by accounting for within-group variations of education levels.
+For this project, we will be analyzing the **phone survey data set of the 2019 Canadian Federal Election Study** to investigate if **education level and age** affect voting party preference. To do this, we will be **stratifying our data into based on education level**, using **International Standard Classification of Education (ISCED) levels** (Government of Canada, Statistics Canada, 2023) and **the Government of Canada 2021 Census Education categories** (Government of Canada, Statistics Canada, 2021) as a reference to group our participants based on their response to *q61* in the Phone Data Dictionary which asks "What is the highest level of education that you have completed?".
 
-| Response | Corresponding Education Level | ISCED Level Definition |
+The ISCED scale offers a standardized framework for comparing education systems across countries (Government of Canada, Statistics Canada, 2023). We utilized this scale in conjunction with variables from the 2021 Canadian Census data to stratify our population accordingly.
+
+By stratifying the sample, we are able to improve the precision of our estimates by accounting for within-group variations of education levels.
+
+| Response | Corresponding Education Level | Education Level Definition |
 |---------------------------|-------------------|---------------------------|
 | No schooling | 0 | Early childhood education |
 | Some elementary school | 0 | Early childhood education |
@@ -39,9 +49,9 @@ For this project, we will be analyzing the phone survey data set to investigate 
 | Master’s degree | 4 | Master/PhD or equivalent level |
 | Professional degree or doctorate | 5 | PhD or equivalent level |
 
-: Our mapping of Phone Data Dictionary Q61 to ISCED_Level and ISCED_Level meaning
+: Our mapping of Phone Data Dictionary Q61 to Education levels
 
-We used the above mapping to map respondent answers to ISCED Levels using the ISCED_Level variable. Respondents who picked the option ("Don't know", "Refused to answer" or "Skipped") were removed from the data set, with only 11 out of the over 4000 participants choosing this response. The other variables of interest were cleaned, where we removed all NA values and invalid voter ages (age \< 18). We used q11 to determine surveyor voting choice, where we grouped them into three categories: "Liberal" for those who said they would vote Liberal, "Not Liberal" for those who said they would vote for a party that was not the Liberal party, and "Unknown" for those who skipped the question or chose not to answer.
+Respondents who picked the option ("Don't know", "Refused to answer" or "Skipped") were removed from the data set, with only 11 out of the over 4000 participants choosing this response. The other variables of interest were cleaned, where we removed all NA values and invalid voter ages (age \< 18). We used q11 to determine surveyor voting choice, where we grouped them into three categories: "Liberal" for those who said they would vote Liberal, "Not Liberal" for those who said they would vote for a party that was not the Liberal party, and "Unknown" for those who skipped the question or chose not to answer.
 
 ```{r, include = FALSE}
 #NA values in age, most likely to vote for (q11) and education level q(61)
@@ -74,8 +84,6 @@ phone_data <- phone_data %>% filter(q61 > 0)
 Given that over 25% of phone survey participants chose not to say which party they were going to vote for in the upcoming election, we will generalize this category (q11) into 3 responses, 'Unknown', 'Liberal', and 'Not Liberal'. Removing all these observations could introduce bias into our analysis and decrease the significance of our results.
 
 ```{r, include = FALSE}
-
-
 # Data Cleaning: Convert q61 into ISCED
 isced_mapping <- c(
   '1' = 0,  # ISCED 0 -> No school
@@ -102,39 +110,38 @@ phone_data <-
 
 ```
 
-Plotting ISCED_Level (based on q61), and Voting preference (based on q11):
+Plotting Education Level (based on q61), and Voting preference (based on q11):
 
-```{r, echo = FALSE}
-layout(matrix(c(1, 3, 1, 3, 2, 4, 2, 4), nrow = 4, byrow = TRUE))
-#Distribution of Isced Level
+```{r, echo = FALSE, fig.dim = c(3, 3), layout="[1,1]"}
 
+boxplot(phone_data$age,
+        main = "Phone Data Boxplot")
+boxplot(phone_data$isced_level,
+        main = "Phone Data Boxplot")
+
+```
+
+```{r, echo = FALSE, fig.dim = c(3, 3), layout="[1,1]"}
+#Age Distribution
+
+hist(phone_data$age, main = "Phone Data Distribution", xlab = "Age", col = "darkblue")
 barplot(table(phone_data$isced_level),
-        main = "Phone Data ISCED Level Distribution",
-        xlab = "ISCED Level",
+        main = "Phone Data Distribution",
+        xlab = "Education Level",
         ylab = "Frequency",
         col = "darkred",
         las = 2) 
 
-boxplot(phone_data$isced_level,
-        main = "Phone Data ISCED_Level Boxplot")
+```
 
-#Distribution of voting preference
-
+```{r, echo = FALSE}
 vote_counts <- phone_data %>% group_by(voting_choice) %>% summarize(count = n())
-
-#Age Distribution
-
-hist(phone_data$age, main = "Phone Data Age Distribution", xlab = "Age", col = "darkblue")
-
-boxplot(phone_data$age,
-        main = "Phone Data Age Boxplot")
 ```
 
 ```{r, echo=FALSE}
-#Bar plot of liberal voters
 ggplot(vote_counts, aes(x = voting_choice, y = count, fill = voting_choice)) +
   geom_bar(stat = "identity") +  # Create bar graph
-  geom_text(aes(label = count), vjust = -0.5, color = "black") +  # Add labels
+  geom_text(aes(label = count), vjust = 1.5, color = "white") +  # Adjust text position
   labs(
     title = "Voting Choice Distribution",
     x = "Voting Choice",
@@ -143,11 +150,12 @@ ggplot(vote_counts, aes(x = voting_choice, y = count, fill = voting_choice)) +
   ) +
   theme_minimal() + 
   scale_fill_manual(values = c("Liberal" = "darkred", "Non Liberal" = "darkblue", "Unknown" = "gray"))
+
 ```
 
 ```{r, echo=FALSE}
 #Summary statistics
-print("ISCED LEVEL")
+print("Education LEVEL")
 summary(phone_data$isced_level)
 
 print("AGE")
@@ -162,14 +170,32 @@ We can make further comparisons on phone survey participants in the 'Unknown' ca
 phone_data_unknown <- phone_data %>% filter(voting_choice == 'Unknown')
 phone_data_known <- phone_data %>% filter(voting_choice == 'Liberal' | voting_choice == 'Non Liberal')
 
-#Unknown Dist
-hist(phone_data_unknown$isced_level, main = "Historgram of ISCED_Level of 'Unknown' Voting Preference", xlab = 'ISCED_Level', col = "black")
+par(mfrow = c(1, 2), mar = c(5, 1, 5, 1))
 
-#Known Dist
-hist(phone_data_known$isced_level, main = "Historgram of ISCED_Level of 'Known' Voting Preference", xlab = 'ISCED_Level', col = "brown")
+# Wrap the title text for better fitting
+title_unknown <- "Bar Plot for 'Unknown'"
+title_known <- "Bar Plot for 'Known'"
+
+unknown_counts <- table(phone_data_unknown$isced_level)
+barplot(unknown_counts, 
+        main = strwrap(title_unknown, width = 40),
+        xlab = "ISCED Level", 
+        col = "black", 
+        las = 2)  # Rotate x-axis labels for better readability
+
+# Create bar plot for Known Distribution (Including NA as a category)
+known_counts <- table(phone_data_known$isced_level)  # Get counts for each ISCED level
+barplot(known_counts, 
+        main = strwrap(title_known, width = 40),  # Wrap the title to fit within width
+        xlab = "ISCED Level", 
+        col = "brown", 
+        las = 2)  # Rotate x-axis labels for better readability
+
+# Reset the plotting area to default (1 plot)
+par(mfrow = c(1, 1))
 ```
 
-These distributions are very similar, therefore, they could be removed without introducing bias into our data.
+These distributions are very similar, therefore, they could be removed without introducing signficant bias into our data. Since we are considering those who specifically voted Liberal in the 2019 Canadian Federal Election, those who inputted Unknown will be insignificant to our study anyway.
 
 ```{r, echo=FALSE}
 # converting voted_liberal to factor binary (Liberal = 1, Non-Liberal = 0)
@@ -264,13 +290,15 @@ svymean(~voting_choice, design=strata_design)
 confint(svymean(~voting_choice, design=strata_design))
 ```
 
-In Table 1 I present the confidence intervals of phone surveys:
+In Table 2, we present the confidence intervals of phone survey:
 
 |   | Proportion of Outcome Variable | 95% Confidence Interval of Outcome Variable |
 |-------------------|-----------------------|------------------------------|
 | Phone Survey | 0.20914 | (0.1950576, 0.2232315) |
 
-: The proportions and 95% confidence intervals of outcome variable of interest calculated for the Canadian Election Study 2019 phone survey data.
+: Proportion of Outcome Variable and 95% Confidence Interval of Outcome Variable
+
+The proportions and 95% confidence intervals of outcome variable of interest calculated for the Canadian Election Study 2019 phone survey data. The 95% Confidence Interval (CI) for the proportion of participants who voted Liberal was calculated using the stratified phone survey data. The estimated proportion of Liberal voters in the sample is 20.91%. Based on the confidence interval, we can say that we are 95% confident that the true proportion of Liberal voters in the population of Canadian voters falls between 19.51% and 22.32%. This interval accounts for the variability in our sample and suggests that, if we were to repeat this sampling process many times, approximately 95% of the resulting confidence intervals would contain the true population proportion of Liberal voters.
 
 <!-- Provide a table or formula of the estimated logistic regression model, and include text describing this table/formula and the key takeaways. Interpret the estimates from the logistic regression model. Specifically, commenting on how the predictor variables relate to the outcome variable. -->
 
@@ -288,6 +316,8 @@ Below is the estimate regression model:
 | ISCED Level | 0.208224           | 0.038918       | 9.28e-08 \*\*\* |
 | Age         | 0.012804           | 0.002728       | 2.77e-06 \*\*\* |
 
+: Estimated Logistic Regression Model
+
 Accounting for stratification, -2.373643 is the log-odds intercept for a person with no school on the ISCED scale (ISCED level = 0) and zero years old. This is just a baseline variable, since anyone who is 0 years old cannot vote.
 
 $\beta_1$ is positive and p-value is \< 0.05, meaning that higher education is associated with higher odds of voting Liberal at significance level. The log odds is 0.208224, meaning that for each one-unit increase in education level, the log-odds of voting Liberal increase by around 20.8%.
@@ -296,33 +326,59 @@ $\beta_2$ is positive with a log-odds value of 0.012804 and p-value is \< 0.05, 
 
 # 5 Discussion
 
-Summarize key findings. Discuss limitations of the analysis (e.g., potential biases, missing variables, survey errors). Provide recommendations for future research or improvements.
+<!-- Summarize key findings. Discuss limitations of the analysis (e.g., potential biases, missing variables, survey errors). Provide recommendations for future research or improvements. -->
+
+Based on our findings, we found that both education and age have a positive effect on the likelihood of voting Liberal, with education level increasing the log-odds of voting for the Liberal party by 17.5% and age increasing the log-odds of voting for the Liberal party by 0.8%. While both are statistically significant, we can suggest that education level has a larger effect on the likelihood for voting Liberal party than age, drawing parallels from previous studies that have suggested that Canadians with a higher level of education tend to vote Liberal (citation). Age has some impact, which also may be correlated with the fact that those with a higher level of education tend to be older (citation).
+
+Though, since Liberal party is only 20.91% of our population, we cannot say that education level is exclusively associated with the Liberal party, or that education is the only thing that is increasing the likelihood of voting Liberal.
+
+Since our analysis was drawn from a phone survey data, we need to account for selection bias: the survey was voluntary, based on those who had access to a technological device, and those who followed up in the survey. The phone data age distribution demonstrated a slight right-skew, possibly suggesting that an older demographic responded to the phone survey. This may introduce some bias since those who are older are likely to have completed a full education compared to those who are younger, closer to 18 years old. Further analyses could be done focused on certain age groups rather than all the ages to have a more focused analysis on education level on voting patterns. We also need to consider that the ISCED is a universal classification of education-level, meaning that the scale is generalized to fit the standard of all education levels across the globe, where there is much variation in how education is offered. To consider Canadian-specific education standards, we may get more reliable, specific findings from a Canadian measure of education. Furthermore, this scale considers higher levels of education dependent on primary, secondary, and postsecondary levels of education. This means that it may omit those who did not complete a certain level of formal education, limiting our analysis to those who have been formally enrolled in education. Further studies could be done on those who have not completed a level of education (i.e. did not go to university/college, etc.) to see how this affects voting patterns. There was also missing values that were removed from the data, impacting the analyses on our sampling population.
+
+Overall, our research generated valuable insight between voting trends in Canadian voters and demographic variables such as education and age. Future research and studies could be made to explore the structure of the Canadian educational system that may explain the trend of Liberal voting, or study other variables that may add to the likelihood of voting Liberal.
 
 # 6 Generative AI Statement
 
-Here is where you can explain your usage of Generative AI tool(s). Be sure to reference any tools with inline citations.
+<!-- Here is where you can explain your usage of Generative AI tool(s). Be sure to reference any tools with inline citations. -->
 
-Alternatively, if you did not use Generative AI, please include a brief statement outlining your workflow for completing this assignment.
+<!-- Alternatively, if you did not use Generative AI, please include a brief statement outlining your workflow for completing this assignment. -->
+
+-   Generative AI was used to clarify function usage, for formatting inputs in R functions and graphs and creating tables in Markdown (ChatGPT 4o).
+
+-   We utilized generative AI to reformulate sentences and improve the clarity of the report (ChatGPT 4o)
+
+    We used generative AI solely as a supplemental tool to assist with code refinement and report writing. While AI was employed for low-level tasks such as grammar checking in code and rewording sentences, the conceptual insights and analyses in both the report discussions and the code were entirely our own.
 
 # 7 Ethics Statement
 
-Explain how you ensured that your analysis is reproducible (e.g., documenting code, using proper statistical methods).
+<!-- Explain how you ensured that your analysis is reproducible (e.g., documenting code, using proper statistical methods). -->
 
-Since the CES 2019 data is publicly available, describe whether or not this the work completed in your report needs Research Ethics Board approval for the report the be made publicly available. Be sure to specifically discuss the privacy of human participants in this study.
+<!-- Since the CES 2019 data is publicly available, describe whether or not this the work completed in your report needs Research Ethics Board approval for the report the be made publicly available. Be sure to specifically discuss the privacy of human participants in this study. -->
+
+The reproducibility of this study has been ensured through comprehensive documentation of the methodologies employed. This includes providing the formula for the confidence interval, describing the logistic regression model, and ensuring that all data sources are thoroughly referenced. Additionally, any data manipulations, such as cleaning and preprocessing, are well documented. Proper statistical methods like T-tests and confidence intervals have been applied to maintain the integrity of the results.
+
+Since the CES 2019 survey data is publicly available, this study does not require Research Ethics Board approval, as it falls under the exemption for research using publicly available data protected by law. The privacy of human participants is safeguarded, as the CES 2019 dataset is anonymized. Furthermore, steps have been taken to ensure that no individual participants can be re-identified, including avoiding manipulations that could expose small sample groups to potential disclosure risks.
 
 \newpage
 
 # 8 Bibliography
 
-1.  Government of Canada, Statistics Canada. “Census Profile, 2021 Census of Populationprofile Table.” *Profile Table, Census Profile, 2021 Census of Population - Canada \[Country\]*, 2 Aug. 2024, www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/page.cfm?LANG=E&GENDERlist=1%2C2%2C3&STATISTIClist=1%2C4&DGUIDlist=2021A000011124&HEADERlist=37&SearchText=Canada.
+1.  Allaire, J. J., et al. (n.d.). *Introduction to R Markdown*. RStudio. Retrieved April 4, 1991, from <https://rmarkdown.rstudio.com/docs/>.
 
-2.  Government of Canada, Statistics Canada. “International Standard Classification of Education (ISCED).” *Government of Canada, Statistics Canada*, 29 June 2023, www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=1275152.
+2.  Dekking, F. M., et al. (2005) *A Modern Introduction to Probability and Statistics: Understanding why and how.* Springer Science & Business Media.
 
-3.  Grolemund, G. (2014, July 16) *Introduction to R Markdown*. RStudio. <https://rmarkdown.rstudio.com/articles_intro.html>. (Last Accessed: April 4, 1991)
+3.  Government of Canada, Statistics Canada. (2023, June 29). *International Standard Classification of Education (ISCED)*. Government of Canada. Retrieved from [www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=1275152](www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=1275152).
 
-4.  Dekking, F. M., et al. (2005) *A Modern Introduction to Probability and Statistics: Understanding why and how.* Springer Science & Business Media.
+4.  Government of Canada, Statistics Canada. (2024, August 2). *Census profile, 2021 Census of Population profile table*. Retrieved from [www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/page.cfm?LANG=E&GENDERlist=1%2C2%2C3&STATISTIClist=1%2C4&DGUIDlist=2021A000011124&HEADERlist=37&SearchText=Canada](www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/page.cfm?LANG=E&GENDERlist=1%2C2%2C3&STATISTIClist=1%2C4&DGUIDlist=2021A000011124&HEADERlist=37&SearchText=Canada).
 
-5.  Allaire, J.J., et. el. *References: Introduction to R Markdown*. RStudio. <https://rmarkdown.rstudio.com/docs/>. (Last Accessed: April 4, 1991)
+5.  Grolemund, G. (2014, July 16). *Introduction to R Markdown*. RStudio. Retrieved April 4, 1991, from <https://rmarkdown.rstudio.com/articles_intro.html>.
+
+6.  Hooghe, M., Dassonneville, R., & Marien, S. (2014). The impact of education on the development of political trust: Results from a five-year panel study among late adolescents and young adults in Belgium. *Political Studies, 63*(1), 123–141. https://doi.org/10.1111/1467-9248.12102.
+
+7.  Kiss, S., Polacko, M., & Graefe, P. (2023). The education and income voting divides in Canada and their consequences for redistributive politics. *Electoral Studies*, *85*, 102648. doi:10.1016/j.electstud.2023.102648.
+
+8.  Leś, Tomasz. (2024). Education, Ideology, and Critical Thinking. 10.4324/9781003386100-5.
+
+9.  Scott, R. (2022). Does university make you more liberal? estimating the within-individual effects of higher education on political values. *Electoral Studies*, *77*, 102471. doi:10.1016/j.electstud.2022.102471.
 
 \newpage
 
