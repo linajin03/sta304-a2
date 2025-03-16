@@ -115,16 +115,16 @@ Plotting Education Level (based on q61), and Voting preference (based on q11):
 ```{r, echo = FALSE, fig.dim = c(3, 3), layout="[1,1]"}
 
 boxplot(phone_data$age,
-        main = "Phone Data Boxplot")
+        main = "Age Boxplot")
 boxplot(phone_data$isced_level,
-        main = "Phone Data Boxplot")
+        main = "Education Boxplot")
 
 ```
 
 ```{r, echo = FALSE, fig.dim = c(3, 3), layout="[1,1]"}
 #Age Distribution
 
-hist(phone_data$age, main = "Phone Data Distribution", xlab = "Age", col = "darkblue")
+hist(phone_data$age, main = "Age Distribution", xlab = "Age", col = "darkblue")
 barplot(table(phone_data$isced_level),
         main = "Phone Data Distribution",
         xlab = "Education Level",
@@ -153,14 +153,16 @@ ggplot(vote_counts, aes(x = voting_choice, y = count, fill = voting_choice)) +
 
 ```
 
-```{r, echo=FALSE}
-#Summary statistics
-print("Education LEVEL")
-summary(phone_data$isced_level)
+### Education LEVEL
+| Min.  | 1st Qu. | Median | Mean  | 3rd Qu. | Max.  |
+|-------|--------|--------|------|--------|------|
+| 0.000 | 1.000  | 2.000  | 2.238 | 3.000  | 5.000 |
 
-print("AGE")
-summary(phone_data$age)
-```
+### AGE
+| Min.  | 1st Qu. | Median | Mean  | 3rd Qu. | Max.  |
+|-------|--------|--------|------|--------|------|
+| 18.00 | 38.00  | 51.00  | 50.89 | 64.00  | 100.00 |
+
 
 From the summary statistics and graph, we can see that the survey population is decently well educated, with a mean and median ISCED score of around 2. This means that the average survey respondent has at least completed community college. The ISCED_Level distribution appears to be right skewed, with the interquartile range from 1 to 3 from the box plot and histogram. The age seems slightly right-skewed, with the interquartile range from late 30’s to early 60’s from the box plot, but has a higher range of ages from 18 to late 90’s. Among the web survey respondents, it shows a slight bi-modal distribution on the histogram, with the interquartile range from from late 30’s to early 60’s.
 
@@ -302,7 +304,7 @@ The proportions and 95% confidence intervals of outcome variable of interest cal
 
 <!-- Provide a table or formula of the estimated logistic regression model, and include text describing this table/formula and the key takeaways. Interpret the estimates from the logistic regression model. Specifically, commenting on how the predictor variables relate to the outcome variable. -->
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning=FALSE}
 logit_model <- svyglm(voting_choice ~ isced_level + age, 
                       design = strata_design, 
                       family = binomial)
@@ -332,7 +334,7 @@ Based on our findings, we found that both education and age have a positive effe
 
 Though, since Liberal party is only 20.91% of our population, we cannot say that education level is exclusively associated with the Liberal party, or that education is the only thing that is increasing the likelihood of voting Liberal.
 
-Since our analysis was drawn from a phone survey data, we need to account for selection bias: the survey was voluntary, based on those who had access to a technological device, and those who followed up in the survey. The phone data age distribution demonstrated a slight right-skew, possibly suggesting that an older demographic responded to the phone survey. This may introduce some bias since those who are older are likely to have completed a full education compared to those who are younger, closer to 18 years old. Further analyses could be done focused on certain age groups rather than all the ages to have a more focused analysis on education level on voting patterns. We also need to consider that the ISCED is a universal classification of education-level, meaning that the scale is generalized to fit the standard of all education levels across the globe, where there is much variation in how education is offered. To consider Canadian-specific education standards, we may get more reliable, specific findings from a Canadian measure of education. Furthermore, this scale considers higher levels of education dependent on primary, secondary, and postsecondary levels of education. This means that it may omit those who did not complete a certain level of formal education, limiting our analysis to those who have been formally enrolled in education. Further studies could be done on those who have not completed a level of education (i.e. did not go to university/college, etc.) to see how this affects voting patterns. There was also missing values that were removed from the data, impacting the analyses on our sampling population.
+Since our analysis was drawn from a phone survey data, we need to account for selection bias: the survey was voluntary, based on those who had access to a technological device, and those who followed up in the survey. The phone data age distribution demonstrated a slight right-skew, possibly suggesting that an older demographic responded to the phone survey. This may introduce some bias since those who are older are likely to have completed a full education compared to those who are younger, closer to 18 years old. Further analyses could be done focused on certain age groups rather than all the ages to have a more focused analysis on education level on voting patterns. We also need to consider that the ISCED is a universal classification of education-level, meaning that the scale is generalized to fit the standard of all education levels across the globe, where there is much variation in how education is offered. To consider Canadian-specific education standards, we may get more reliable, specific findings from a Canadian measure of education. Furthermore, this scale considers higher levels of education dependent on primary, secondary, and postsecondary levels of education. This means that it may omit those who did not complete a certain level of formal education, limiting our analysis to those who have been formally enrolled in education. Further studies could be done on those who have not completed a level of education (i.e. did not go to university/college, etc.) to see how this affects voting patterns. There was also missing values that were removed from the data, impacting the analyses on our sampling population. Some studies have also stated that higher education can also result in economically right-wing views (Scott, 2022). This suggest that there needs to be a consideration of other factors that influences political opinions.
 
 Overall, our research generated valuable insight between voting trends in Canadian voters and demographic variables such as education and age. Future research and studies could be made to explore the structure of the Canadian educational system that may explain the trend of Liberal voting, or study other variables that may add to the likelihood of voting Liberal.
 
